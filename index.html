@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- YOU ARE THE PROBLEM — a browser-based choose-your-own-adventure game
+     built for an L2 LLCER assignment. No frameworks, no libraries, just HTML,
+     CSS and vanilla JavaScript. The music is a single looping MP3 (ost.mp3).
+     Everything else is generated at runtime from the SCENES object in script.js. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOU ARE THE PROBLEM</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="logo.ico">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Anton&display=swap" rel="stylesheet">
+</head>
+<body data-mode="noir">
+
+<div id="title-screen" onclick="startGame()" onkeydown="startGame()">
+  <h1>
+    <span class="title-you">You</span>
+    <span class="title-are">are</span>
+    <span class="title-the">the</span>
+    <span class="title-problem">Problem</span>
+  </h1>
+  <div class="press">Press any key to begin</div>
+  <div class="ver">v1.0</div>
+  <div class="year">Los Angeles — 1988</div>
+</div>
+
+<div id="flash"></div>
+<div id="app"></div>
+
+<audio id="ost" src="ost.mp3" loop preload="auto"></audio>
+
+<button id="music-btn" onclick="toggleMusic()" title="Mute music" aria-label="Toggle music">
+  <span id="music-icon">♪</span>
+</button>
+
+<button id="tree-btn" onclick="showTree()" title="View game tree" aria-label="View game tree">
+  <span>◈</span>
+</button>
+
+<script src="script.js"></script>
+</body>
+</html>

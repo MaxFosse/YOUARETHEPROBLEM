@@ -1,0 +1,558 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #09090a;
+  --text: #d8d4cc;
+  --accent: #555550;
+  --muted: #44443e;
+  --border: #222;
+  --transition: 0.7s ease;
+}
+body[data-mode="rouge"]      { --accent: #c91a00; --muted: #664030; --border: #2a1510; }
+body[data-mode="sepia"]      { --accent: #b89a50; --muted: #5a4e30; --border: #221c10; }
+body[data-mode="convergence"]{ --accent: #c91a00; --muted: #553030; }
+body[data-mode="fin_a"]      { --accent: #3a8c78; --muted: #2a4e44; }
+body[data-mode="fin_b"]      { --accent: #c91a00; --muted: #553030; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Film grain */
+/* Film grain — subtle animated SVG noise overlay that gives the screen a slightly
+   worn, analogue feeling. The animation steps through random offsets every 0.12s
+   which is fast enough to feel like actual film grain without being distracting. */
+@keyframes grain {
+  0%   { background-position:   0%   0%; }
+  20%  { background-position: -8%  -12%; }
+  40%  { background-position:  6%   9%; }
+  60%  { background-position: -11%  4%; }
+  80%  { background-position:  4%  -7%; }
+  100% { background-position:   0%   0%; }
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.12s steps(2) infinite;
+}
+
+/* Scanlines */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+}
+
+/* Attrib links */
+.attrib a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+.attrib a:hover { color: var(--accent); }
+
+/* Flash */
+#flash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+}
+#flash.pop { animation: flashPop 0.7s ease-out forwards; }
+@keyframes flashPop {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Scene */
+.scene {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 6rem) 1.8rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp 0.55s ease forwards;
+}
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+.chapter {
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.2rem;
+  transition: color var(--transition);
+}
+
+h1 {
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: clamp(3.2rem, 10vw, 6.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2.2rem;
+  transition: color var(--transition);
+}
+
+.narrator-block {
+  border-left: 2px solid var(--accent);
+  padding: 0.6rem 1rem;
+  margin-bottom: 2rem;
+  transition: border-color var(--transition);
+}
+.narrator-block .quote {
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.narrator-block .source {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-style: normal;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 1.1rem;
+  max-width: 58ch;
+  transition: color var(--transition);
+}
+p strong { color: var(--accent); font-weight: 700; transition: color var(--transition); }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transition: border-color var(--transition); }
+
+/* Choices — the main interaction element. Transparent by default, fills on hover
+   so it feels like you're actually committing to something rather than just clicking a link. */
+.choices { margin-top: 2.4rem; display: flex; flex-direction: column; gap: 0.7rem; }
+
+.choice {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.2rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  letter-spacing: 0.02em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.choice .arrow { color: var(--accent); transition: transform 0.18s ease, color var(--transition); flex-shrink: 0; }
+.choice:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.choice:hover .arrow { color: var(--bg); transform: translateX(3px); }
+
+.choice.ghost {
+  border-color: var(--border);
+  color: var(--muted);
+  font-size: 0.82rem;
+  opacity: 0.7;
+}
+.choice.ghost:hover { background: var(--border); border-color: var(--border); color: var(--text); opacity: 1; }
+.choice.ghost:hover .arrow { color: var(--text); }
+
+/* Node hub grid */
+.node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8rem; margin-top: 1.8rem; }
+
+.node-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  padding: 1.1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+.node-btn:hover { border-color: var(--accent); background: rgba(255,255,255,0.03); }
+.node-btn .nname { display: block; font-weight: 700; font-size: 0.9rem; color: var(--accent); margin-bottom: 0.25rem; transition: color var(--transition); }
+.node-btn .ndesc { display: block; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; transition: color var(--transition); }
+.node-btn.done { opacity: 0.45; }
+.node-btn.done .nname::after { content: ' ✓'; }
+
+.hub-footer { margin-top: 1.4rem; display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.progress-txt { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--muted); transition: color var(--transition); }
+
+/* Attribution */
+.attrib {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem;
+  line-height: 1.9;
+  color: var(--muted);
+  transition: color var(--transition), border-color var(--transition);
+}
+.attrib strong { color: var(--text); letter-spacing: 0.05em; font-size: 0.7rem; text-transform: uppercase; }
+.attrib em { font-style: italic; }
+
+/* Title screen — fixed over everything, fades out when the player starts.
+   The '.out' class is added on click/keydown, triggering the CSS opacity transition.
+   After the fade, display:none kicks in so it no longer intercepts events. */
+#title-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+  transition: opacity 0.9s ease;
+}
+#title-screen.out { opacity: 0; pointer-events: none; }
+
+#title-screen h1 {
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: clamp(3.5rem, 13vw, 9rem);
+  line-height: 0.86;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 0;
+  opacity: 0;
+  animation: titleReveal 1.4s ease 0.4s forwards;
+}
+@keyframes titleReveal {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+#title-screen .title-you {
+  display: block;
+  color: var(--text);
+  opacity: 0.28;
+  font-size: clamp(2rem, 7vw, 5rem);
+  letter-spacing: 0.18em;
+}
+#title-screen .title-are {
+  display: block;
+  color: var(--text);
+  opacity: 0.28;
+  font-size: clamp(2rem, 7vw, 5rem);
+  letter-spacing: 0.18em;
+}
+#title-screen .title-the {
+  display: block;
+  color: var(--text);
+  opacity: 0.18;
+  font-size: clamp(1.4rem, 5vw, 3.5rem);
+  letter-spacing: 0.32em;
+}
+#title-screen .title-problem {
+  display: block;
+  color: #c91a00;
+  font-size: clamp(4rem, 15vw, 11rem);
+  letter-spacing: -0.03em;
+  line-height: 0.82;
+}
+
+#title-screen .press {
+  margin-top: 3.5rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  animation: titleReveal 1s ease 2s forwards, blink 1.8s ease 2s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 0.15; }
+}
+
+#title-screen .year {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  opacity: 0.5;
+}
+#title-screen .ver {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+/* Refuse-glasses shake */
+@keyframes shake {
+  0%,100% { transform: translateX(0) rotate(0deg); }
+  12%     { transform: translateX(-9px) rotate(-0.4deg); }
+  28%     { transform: translateX(8px)  rotate(0.3deg); }
+  44%     { transform: translateX(-6px) rotate(-0.2deg); }
+  60%     { transform: translateX(5px)  rotate(0.2deg); }
+  76%     { transform: translateX(-3px); }
+  90%     { transform: translateX(2px); }
+}
+.shake { animation: shake 0.5s cubic-bezier(0.36,0.07,0.19,0.97) forwards; }
+
+/* Arendt scene timer — a thin bar + countdown forces the player to sit with the
+   text for 10 seconds before making their final choice. It's uncomfortable on purpose. */
+#arendt-timer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 500;
+  height: 4px;
+  background: var(--border);
+  pointer-events: none;
+}
+#arendt-timer-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: none;
+}
+#arendt-countdown {
+  position: fixed;
+  bottom: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: clamp(3rem, 8vw, 5rem);
+  color: var(--accent);
+  opacity: 0.12;
+  pointer-events: none;
+  transition: opacity 0.25s ease, color 0.25s ease;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+#arendt-countdown.urgent {
+  opacity: 0.55;
+  color: #c91a00;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* ── Fixed buttons (music + tree) ── */
+#music-btn,
+#tree-btn {
+  position: fixed;
+  bottom: 1.4rem;
+  z-index: 200;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.9rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.4s ease, border-color 0.18s ease, color 0.18s ease;
+}
+#music-btn { right: 1.4rem; }
+#tree-btn  { right: 4.4rem; font-size: 0.82rem; }
+
+#music-btn:hover,
+#tree-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+#music-btn.muted {
+  opacity: 0.35 !important;
+  text-decoration: line-through;
+}
+
+/* ── Game Tree Overlay ── */
+#tree-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 10, 0.92);
+  z-index: 5000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 1rem;
+}
+#tree-overlay.open { opacity: 1; }
+
+#tree-panel {
+  max-width: 700px;
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 1.6rem 1.8rem 1.4rem;
+}
+
+.tree-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.4rem;
+}
+
+.tree-title {
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  transition: color var(--transition);
+}
+
+.tree-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.75rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.tree-close:hover { border-color: var(--accent); color: var(--accent); }
+
+#tree-svg-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.tree-stats {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.tree-legend {
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  transition: color var(--transition);
+}
+.tree-legend .leg-active  { color: #c91a00; }
+.tree-legend .leg-session { color: #888880; }
+.tree-legend .leg-known   { color: #555550; }
+.tree-legend .leg-unseen  { color: #333330; }
+
+/* ── Credits block (shown at the end of each ending) ── */
+/* I wanted this to feel like a film credit card, not a boring footer */
+.credits {
+  margin-top: 2rem;
+  padding: 1.6rem 1.4rem;
+  border: 1px solid var(--accent);
+  text-align: center;
+  position: relative;
+  transition: border-color var(--transition);
+}
+
+/* Thin decorative lines above and below the name */
+.credits::before,
+.credits::after {
+  content: '';
+  display: block;
+  width: 2.4rem;
+  height: 1px;
+  background: var(--accent);
+  margin: 0.55rem auto;
+  transition: background var(--transition);
+}
+
+.credits-label {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+  transition: color var(--transition);
+}
+
+.credits-name {
+  display: block;
+  font-family: 'Anton', Impact, sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2.8rem);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  transition: color var(--transition);
+}
+
+.credits-course {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+  transition: color var(--transition);
+}
+
+.credits-year {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  transition: color var(--transition);
+}
