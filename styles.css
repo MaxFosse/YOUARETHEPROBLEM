@@ -1,5 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Les variables CSS, toute la palette du jeu passe par là. */
 :root {
   --bg: #09090a;
   --text: #d8d4cc;
@@ -24,10 +25,7 @@ body {
   transition: background var(--transition), color var(--transition);
 }
 
-/* Film grain */
-/* Film grain — subtle animated SVG noise overlay that gives the screen a slightly
-   worn, analogue feeling. The animation steps through random offsets every 0.12s
-   which is fast enough to feel like actual film grain without being distracting. */
+/* Grain film */
 @keyframes grain {
   0%   { background-position:   0%   0%; }
   20%  { background-position: -8%  -12%; }
@@ -48,7 +46,7 @@ body::before {
   animation: grain 0.12s steps(2) infinite;
 }
 
-/* Scanlines */
+/* Scanlines parce que l'effet grain tout seul c'est bien, mais l'effet grain + scanlines c'est mieux. Gingembre. */
 body::after {
   content: '';
   position: fixed;
@@ -58,7 +56,7 @@ body::after {
   background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
 }
 
-/* Attrib links */
+/* Liens d'attribution en bas*/
 .attrib a {
   color: var(--muted);
   text-decoration: underline;
@@ -68,7 +66,7 @@ body::after {
 }
 .attrib a:hover { color: var(--accent); }
 
-/* Flash */
+/* Flash blanc (j'ai essayer de pas trop éclaté les yeux, vraiment...) */
 #flash {
   position: fixed;
   inset: 0;
@@ -84,7 +82,7 @@ body::after {
   100% { opacity: 0; }
 }
 
-/* Scene */
+/* Conteneur de scène (chiant en vrai) */
 .scene {
   max-width: 660px;
   margin: 0 auto;
@@ -99,6 +97,7 @@ body::after {
 }
 @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
+/* Indicateur de chapitre (oui j'ai marqué un comm parce que je le perdais à chaque fois) */
 .chapter {
   font-size: 0.68rem;
   letter-spacing: 0.28em;
@@ -119,6 +118,7 @@ h1 {
   transition: color var(--transition);
 }
 
+/* Bloc narrateur */
 .narrator-block {
   border-left: 2px solid var(--accent);
   padding: 0.6rem 1rem;
@@ -151,8 +151,8 @@ p strong { color: var(--accent); font-weight: 700; transition: color var(--trans
 
 hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transition: border-color var(--transition); }
 
-/* Choices — the main interaction element. Transparent by default, fills on hover
-   so it feels like you're actually committing to something rather than just clicking a link. */
+/* Les choix, l'élément central du truc.
+   J'ai essayer de faire que tu aies l'impression de vraiment t'engager dans un truc plutôt que de juste cliquer sur un lien. */
 .choices { margin-top: 2.4rem; display: flex; flex-direction: column; gap: 0.7rem; }
 
 .choice {
@@ -175,6 +175,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 .choice:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 .choice:hover .arrow { color: var(--bg); transform: translateX(3px); }
 
+/* Choix fantôme */
 .choice.ghost {
   border-color: var(--border);
   color: var(--muted);
@@ -184,7 +185,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 .choice.ghost:hover { background: var(--border); border-color: var(--border); color: var(--text); opacity: 1; }
 .choice.ghost:hover .arrow { color: var(--text); }
 
-/* Node hub grid */
+/* Grille du hub */
 .node-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8rem; margin-top: 1.8rem; }
 
 .node-btn {
@@ -206,7 +207,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 .hub-footer { margin-top: 1.4rem; display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
 .progress-txt { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--muted); transition: color var(--transition); }
 
-/* Attribution */
+/* Attribution en bas */
 .attrib {
   margin-top: 3.5rem;
   padding-top: 1.5rem;
@@ -219,9 +220,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 .attrib strong { color: var(--text); letter-spacing: 0.05em; font-size: 0.7rem; text-transform: uppercase; }
 .attrib em { font-style: italic; }
 
-/* Title screen — fixed over everything, fades out when the player starts.
-   The '.out' class is added on click/keydown, triggering the CSS opacity transition.
-   After the fade, display:none kicks in so it no longer intercepts events. */
+/* Écran titre */
 #title-screen {
   position: fixed;
   inset: 0;
@@ -274,6 +273,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   font-size: clamp(1.4rem, 5vw, 3.5rem);
   letter-spacing: 0.32em;
 }
+
 #title-screen .title-problem {
   display: block;
   color: #c91a00;
@@ -282,6 +282,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   line-height: 0.82;
 }
 
+/* "Press any key" anim */
 #title-screen .press {
   margin-top: 3.5rem;
   font-family: 'Courier Prime', monospace;
@@ -297,6 +298,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   50%       { opacity: 0.15; }
 }
 
+/* Année et version en bas (ça ressemble à un vrai écran titre de jeu mtn) */
 #title-screen .year {
   position: absolute;
   bottom: 2rem;
@@ -318,7 +320,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   opacity: 0.5;
 }
 
-/* Refuse-glasses shake */
+/* Shake pour la scène des lunettes */
 @keyframes shake {
   0%,100% { transform: translateX(0) rotate(0deg); }
   12%     { transform: translateX(-9px) rotate(-0.4deg); }
@@ -330,8 +332,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 }
 .shake { animation: shake 0.5s cubic-bezier(0.36,0.07,0.19,0.97) forwards; }
 
-/* Arendt scene timer — a thin bar + countdown forces the player to sit with the
-   text for 10 seconds before making their final choice. It's uncomfortable on purpose. */
+/* Timer Arendt,Le joueur est obligé de rester avec le texte. C'est inconfortable. C'est voulu.
+   (Oui madame, c'est fait exprès.) */
 #arendt-timer {
   position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -346,6 +348,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   background: var(--accent);
   transition: none;
 }
+
 #arendt-countdown {
   position: fixed;
   bottom: 1.2rem;
@@ -366,11 +369,12 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   color: #c91a00;
 }
 
+/* Scrollbar bien fine là */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 
-/* ── Fixed buttons (music + tree) ── */
+/* Boutons musique et arbre. Cachés au départ, révélés par script.js après le titre. */
 #music-btn,
 #tree-btn {
   position: fixed;
@@ -398,12 +402,13 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   border-color: var(--accent);
   color: var(--accent);
 }
+
 #music-btn.muted {
   opacity: 0.35 !important;
   text-decoration: line-through;
 }
 
-/* ── Game Tree Overlay ── */
+/* Overlay de l'arbre de jeu  */
 #tree-overlay {
   position: fixed;
   inset: 0;
@@ -418,6 +423,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 }
 #tree-overlay.open { opacity: 1; }
 
+/* Panel de l'arbre  */
 #tree-panel {
   max-width: 700px;
   width: 100%;
@@ -463,6 +469,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   overflow: hidden;
 }
 
+/* Stats de l'arbre  */
 .tree-stats {
   display: flex;
   justify-content: space-between;
@@ -494,8 +501,6 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
 .tree-legend .leg-known   { color: #555550; }
 .tree-legend .leg-unseen  { color: #333330; }
 
-/* ── Credits block (shown at the end of each ending) ── */
-/* I wanted this to feel like a film credit card, not a boring footer */
 .credits {
   margin-top: 2rem;
   padding: 1.6rem 1.4rem;
@@ -505,7 +510,6 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   transition: border-color var(--transition);
 }
 
-/* Thin decorative lines above and below the name */
 .credits::before,
 .credits::after {
   content: '';
@@ -527,6 +531,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; transiti
   transition: color var(--transition);
 }
 
+/* Le nom en grand comme sur une affiche, parce que c'est mon jeu et que je mérite une affiche. */
 .credits-name {
   display: block;
   font-family: 'Anton', Impact, sans-serif;
